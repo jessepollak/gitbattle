@@ -1,5 +1,10 @@
 body {
     background-color: rgb(0, 22, 62)!important;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+h1, h2, h3, #submit {
+    font-family: 'Titillium Web', sans-serif;
 }
 
 div {
@@ -20,7 +25,6 @@ div {
 }
 
 #title h1 {
-    font-family: 'Titillium Web', sans-serif;
     font-style: italic;
     color: white;
     font-size: 140px;
@@ -29,14 +33,12 @@ div {
 
 #title h3 {
     margin-top: 0;
-    font-family: 'Titillium Web', sans-serif;
     color: rgb(186, 0,0);
 }
 
 
 #title h5 {
     margin-top: -10px;
-    font-family: 'Titillium Web', sans-serif;
     color: white;
 }
 
@@ -45,7 +47,6 @@ div {
     font-size: 50px;
     line-height: 80px;
     width: 100%;
-    font-family: 'Titillium Web', sans-serif;
     font-weight: bold;
     text-align: center;
 }
@@ -64,7 +65,6 @@ input:focus {
 
 .vs h2 {
     line-height: 80px;
-    font-family: 'Titillium Web', sans-serif;
     font-size: 100px;
     color: white;
     margin: 0px;
@@ -77,7 +77,6 @@ input:focus {
 
 #submit {
     margin: auto;
-    font-family: 'Titillium Web', sans-serif;
     margin-top: 80px;
     padding: 20px 20px;
     background: rgb(250, 195, 0);
@@ -90,7 +89,6 @@ input:focus {
 
 #loading {
     line-height: 80px;
-    font-family: 'Titillium Web', sans-serif;
     font-size: 60px;
     color: white;
     margin: 0px;
@@ -101,7 +99,6 @@ input:focus {
 }
 
 .processing-container h5 {
-    font-family: 'Titillium Web', sans-serif;
     color: rgb(186, 0,0);
     margin: 5px 7px 5px 0;
     padding: 5px 7px;
@@ -124,14 +121,13 @@ input:focus {
 }
 
 .label {
-    font-family: 'Titillium Web', sans-serif;
     color: white;
     font-size: 30px;
     margin-bottom: 0px;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .graph h3 {
-    font-family: 'Titillium Web', sans-serif;
     color: white;
     font-size: 70px;
     line-height: 60px;
@@ -165,14 +161,12 @@ input:focus {
 
 
 .score h3 {
-    font-family: 'Titillium Web', sans-serif;
     color: white;
     font-size: 70px;
     line-height: 60px;
 }
 
 .score h2 {
-    font-family: 'Titillium Web', sans-serif;
     color: white;
     font-size: 100px;
     line-height: 100px;
@@ -186,7 +180,6 @@ input:focus {
 
 .twitter h5 {
     color: white;
-    font-family: 'Titillium Web', sans-serif;
     display: inline;
     position: relative;
     left: 10px;
@@ -198,7 +191,6 @@ input:focus {
 
 #retry {
     margin: auto;
-    font-family: 'Titillium Web', sans-serif;
     padding: 20px 20px;
     background: rgb(250, 195, 0);
     line-height: 100px;
@@ -218,12 +210,10 @@ input:focus {
 
 .hn-container h5 { 
     color: white;
-    font-family: 'Titillium Web', sans-serif;
 }
 
 .share-container h5 {
     color: white;
-    font-family: 'Titillium Web', sans-serif;
 }
 
 .loser {
