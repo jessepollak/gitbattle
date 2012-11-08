@@ -3,15 +3,16 @@
 // you don't try and abuse them. Thanks!
 IDENTITY = '?client_id=ac46392bf2f66282bc31&client_secret=563c93bb3e0c4d2b2d677c9acedf33a6f97bcd00'
 GITHUB = 'https://api.github.com/';
+
 var Scraper = function() {  
     this.getUserData = function(USER, $el, user_def) {
-        if (typeof Storage !== 'undefined' && localStorage[USER]) {
-            var user = JSON.parse(localStorage.getItem(USER));
-            if(((new Date()) - Date.parse(user.processed)) / 1000 < 60*60*24) {
-                user_def.resolve(user);
-                return;
-            }
-        } 
+        // if (typeof Storage !== 'undefined' && localStorage[USER]) {
+        //     var user = JSON.parse(localStorage.getItem(USER));
+        //     if(((new Date()) - Date.parse(user.processed)) / 1000 < 60*60*24) {
+        //         user_def.resolve(user);
+        //         return;
+        //     }
+        // } 
 
         var forks = 0,
             stars = 0,
@@ -30,6 +31,7 @@ var Scraper = function() {
         promises.push($.get(GITHUB + 'users/' + USER + IDENTITY, function(data) {
             data = data.data;
             followers = data.followers;
+            console.log(followers, USER);
             createdAt = data.created_at;
             userData = data;
         }, 'jsonp'));
@@ -58,31 +60,40 @@ var Scraper = function() {
         );
 
         $el.show();
-        promises.push(
-            $.Deferred(function (top_def) {
-                $.get(GITHUB + 'users/' + USER + '/repos' + IDENTITY + '&per_page=100', 
-                    function(data) {
-                        data = data.data;
-                        for(var i = 0; i < data.length; i++) {
-                            var e = data[i];
-                            if(e.size > 0) {
-                                repos++;
-                                if(!e.fork && e.forks) {
-                                    forks += e.forks;
-                                }
-                                if (e.watchers) stars += e.watchers;
-                                elChild.append('<h5 data-name="' + e.name + '">' 
-                                    + e.name + '</h5>');
-                                promises.push($.Deferred(function (def) {
-                                    getCommitCount(GITHUB + 'repos/' + 
-                                    USER + '/' + e.name + '/commits' + IDENTITY
-                                    + '&per_page=100&author=' + USER, e.name, def);
-                                }));
-                            }
-                        }
+        promises.push($.Deferred(
+            function(def) { 
+                getRepoData(GITHUB + 'users/' + USER + '/repos' + IDENTITY + '&per_page=100', def);
+            }
+        ));
 
-                        
-                        top_def.resolve();
+        function getRepoData(url, def) {
+            $.get(
+                url, 
+                function(resp, status, obj) {
+                    data = resp.data;
+                    for(var i = 0; i < data.length; i++) {
+                        var e = data[i];
+                        if(e.size > 0) {
+                            repos++;
+                            if(!e.fork && e.forks) {
+                                forks += e.forks;
+                            }
+                            if (e.watchers) stars += e.watchers;
+                            elChild.append('<h5 data-name="' + e.name + '">' 
+                                + e.name + '</h5>');
+                            promises.push($.Deferred(function (def) {
+                                getCommitCount(e.name, def);
+                            }));
+                        }
+                    }
+
+                    console.log(resp.meta, USER)
+                    var next= hasNext(resp.meta.Link);
+
+                    if(next.hasNext) {
+                        getRepoData(next.nextLink, def);
+                    } else {            
+                        def.resolve();
                         $.when.apply(null, promises).done(function(args1, args2) {
                             user_def.resolve({
                                 age: createdAt,
@@ -95,10 +106,10 @@ var Scraper = function() {
                                 gists: gists
                             });
                         });
-                    }, 
-                    'jsonp');
-            })
-        );
+                    }      
+                }, 
+                'jsonp');
+        }
 
         function getNumberCount(url, def) {
             var count = 0;
@@ -130,30 +141,47 @@ var Scraper = function() {
             return count;
         }
 
-        function getCommitCount(url, name, def) {
-            $.get(
-                url,
+        function getCommitCount(name, def) {
+            var url = GITHUB + 'repos/' + USER + '/' + name + '/contributors' + IDENTITY;
+            $.get(url,
                 function(resp, status, obj) {
-                    if(resp.data.message && resp.data.message === "Git Repository is empty.") {
-                        def.resolve();
-                        return;
-                    }
-                    commits += resp.data.length;
-                    linkHeader = resp.meta.Link;
-                    if(linkHeader) {
-                        var next = hasNext(linkHeader);
-                        if(next.hasNext) {
-                            getCommitCount(next.nextLink, name, def);
-                        } else {
+                    if(resp.data) {
+                        var user = false;
+                        if(resp.data.message === "Git Repository is empty.") {
+                            def.resolve();
+                            return;
+                        }
+
+                        resp.data.forEach(function(c) {
+                            if(c.login === USER) {
+                                commits += c.contributions;
+                                user = true;
+                            }
+                        });
+
+                        if(user) {
                             if(def && def.state() == 'pending') {
                                 elChild.find('h5[data-name="' + name + '"]').remove();
                                 def.resolve();
                             }
-                        }
-                    }  else {
-                        if(def && def.state() == 'pending') {
-                            elChild.find('h5[data-name="' + name + '"]').remove();
-                            def.resolve();
+                        } else {
+                            linkHeader = resp.meta.Link;
+                            if(linkHeader) {
+                                var next = hasNext(linkHeader);
+                                if(next.hasNext) {
+                                    getCommitCount(next.nextLink, name, def);
+                                } else {
+                                    if(def && def.state() == 'pending') {
+                                        elChild.find('h5[data-name="' + name + '"]').remove();
+                                        def.resolve();
+                                    }
+                                }
+                            }  else {
+                                if(def && def.state() == 'pending') {
+                                    elChild.find('h5[data-name="' + name + '"]').remove();
+                                    def.resolve();
+                                }
+                            }
                         }
                     }
                 },
@@ -183,13 +211,15 @@ var Scraper = function() {
         function hasNext(linkHeader) {
             var next = false;
             var nextLink;
-            linkHeader.forEach(function(e) {
-                var verb = e[1].rel;
-                if(verb == 'next') {
-                    next = true;
-                    nextLink = e[0];
-                }
-            });
+            if(linkHeader) {
+                linkHeader.forEach(function(e) {
+                    var verb = e[1].rel;
+                    if(verb == 'next') {
+                        next = true;
+                        nextLink = e[0];
+                    }
+                });
+            }
             return {
                 hasNext: next,
                 nextLink: nextLink

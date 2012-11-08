@@ -1,6 +1,7 @@
 
 
-var stats = ['age', 'stars', 'forks', 'commits', 'repositories', 'gists'], users = [];
+var stats = ['age', 'stars', 'forks', 'commits', 'repositories', 'gists', 'followers'],
+ users = [];
 $(document).ready(function() {
     var params = getUrlParams();
     var u1 = params.u1;
@@ -225,7 +226,8 @@ var formattedNames = {
     'stars': 'Stars/repo',
     'commits': 'Commits/day',
     'repositories': 'Repos',
-    'gists': 'Gists'
+    'gists': 'Gists',
+    'followers': 'Followers'
 }
 
 function reset() {
@@ -262,7 +264,7 @@ function normalize(r, name) {
         if(r.user1.actual == 0) r.user1.actual = '~0';
         if(r.user2.actual == 0) r.user2.actual = '~0';
     }
-    if(name === 'repositories' || name === 'gists') {
+    if(name === 'gists') {
         if(r.user1.actual > 100) r.user1.actual = '100+';
         if(r.user2.actual > 100) r.user2.actual = '100+';
     }
@@ -355,7 +357,7 @@ function dataFormatter(user1, user2, stat) {
                     "percent": dp2
                 }
             };
-    } else if (stat === 'gists' || stat === 'repositories') {
+    } else if (stat === 'gists' || stat === 'repositories' || stat === 'followers') {
         var total = (user1[stat] + user2[stat]);
         if (total === 0) {
             var dp1 = 50, 
