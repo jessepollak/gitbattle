@@ -409,17 +409,18 @@ function finalScore(user) {
         commits = user.commits, 
         forks = user.forks, 
         stars = user.stars, 
-        gists = user.gists;
+        gists = user.gists,
+        followers = user.followers;
+
     // all times in seconds
     var github_founding_time = 1206835200
-        user_init_time = (Date.parse(time) / 1000),
-        now_time = (Date.parse(new Date()) / 1000),
-        diff_time = now_time - user_init_time;
+    user_init_time = (Date.parse(time) / 1000),
+    now_time = (Date.parse(new Date()) / 1000),
+    diff_time = now_time - user_init_time;
 
     /*
     * Perfect scores are in ()
     */
-
 
     // find age score (in percentage of time on github since the beginning) (1, since very first day)
     if (now_time - github_founding_time != 0) {
@@ -430,20 +431,20 @@ function finalScore(user) {
     }
 
     // find raw gist score (100)
-    var raw_score_gist = Math.sqrt(gists) / 10;
+    var raw_score_gist = Math.sqrt(gists) / Math.sqrt(75 * raw_score_age);
     if (raw_score_gist > 1) {
         raw_score_gist = 1;
     }
 
     // find raw repo score (100)
-    var raw_score_repo = Math.sqrt(repos) / 10;
+    var raw_score_repo = Math.sqrt(repos) / Math.sqrt(75 * raw_score_age);
     if (raw_score_repo > 1) {
         raw_score_repo = 1;
     }
 
     // find raw commits per day score (36)
     if (diff_time > 0) {
-        var raw_score_cpd = Math.sqrt((commits / (diff_time / 86400))) / 5.75;
+        var raw_score_cpd = Math.sqrt((commits / (diff_time / 86400))) / 6;
         if (raw_score_cpd > 1) {
             raw_score_cpd = 1;
         }
@@ -463,7 +464,7 @@ function finalScore(user) {
 
     // find raw stars per repo (1024)
     if (repos > 0) {
-        var raw_score_spr = Math.sqrt(stars / repos) / 31;
+        var raw_score_spr = Math.sqrt(stars / repos) / 32;
         if(raw_score_spr > 1) {
             raw_score_spr = 1;
         }
@@ -471,10 +472,16 @@ function finalScore(user) {
         var raw_score_spr = 0;
     }
 
+    var raw_score_followers = Math.sqrt(followers) / 70;
+    if (raw_score_followers > 1) {
+        raw_score_followers = 1;
+    }
+
     // add weights
-    var final_score = ((raw_score_age * 0.1) + (raw_score_gist * 0.05) + (raw_score_repo * 0.1) + (raw_score_cpd * 0.45) + (raw_score_fpr * 0.15) + (raw_score_spr * 0.15)) * 100;
+    var final_score = ((raw_score_followers * 0.1) + (raw_score_gist * 0.05) + (raw_score_repo * 0.05) + (raw_score_cpd * 0.2) + (raw_score_fpr * 0.3) + (raw_score_spr * 0.3)) * 100;
 
     return final_score.toFixed(2);
+
 }
 
 function getUrlParams() {
