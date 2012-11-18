@@ -55,6 +55,9 @@ function visualize(e) {
                         if (data.data && data.data.message == "Not Found") {
                             $(form['user_' + key]).css('border', '5px solid rgb(186, 0,0)');
                             fail = true;
+                        } else {
+                            // #6 - Use the login for all future requests
+                            users[key-1] = data.data.login;
                         }
                         def.resolve();
                     },
