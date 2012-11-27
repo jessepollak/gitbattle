@@ -180,8 +180,8 @@ function countUp(el) {
 function setupWinner(u1, u2) {
     var u1Score = finalScore(u1),
         u2Score = finalScore(u2);
-    $('.result_1 h3').text(users[0]);
-    $('.result_2 h3').text(users[1]);
+    $('.result_1 h3').html("<a href=\"https://github.com/"+users[0]+"\">"+users[0]+"</a>");
+    $('.result_2 h3').html("<a href=\"https://github.com/"+users[1]+"\">"+users[1]+"</a>");
     $('.result_1 h2').text(0);
     $('.result_2 h2').text(0);
     $('.result_1 h2').data('total', u1Score);
